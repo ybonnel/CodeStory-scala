@@ -14,19 +14,101 @@ class ApplicationSpec extends Specification {
   
   "Application" should {
     
-    "send 404 on a bad request" in {
+    "send email on email query" in {
       running(FakeApplication()) {
-        route(FakeRequest(GET, "/boum")) must beNone        
+        val answer = route(FakeRequest(GET, "/?q=Quelle+est+ton+adresse+email")).get
+
+        status(answer) must equalTo(OK)
+        contentAsString(answer) must equalTo("ybonnel@gmail.com")
       }
     }
-    
-    "render the index page" in {
+
+    "should answer to ml" in {
       running(FakeApplication()) {
-        val home = route(FakeRequest(GET, "/")).get
-        
-        status(home) must equalTo(OK)
-        contentType(home) must beSome.which(_ == "text/html")
-        contentAsString(home) must contain ("Your new application is ready.")
+
+        val answer = route(FakeRequest(GET, "/?q=Es+tu+abonne+a+la+mailing+list(OUI/NON)")).get
+
+        status(answer) must equalTo(OK)
+        contentAsString(answer) must equalTo("OUI")
+      }
+    }
+
+    "should answer to participate" in {
+      running(FakeApplication()) {
+
+        val answer = route(FakeRequest(GET, "/?q=Es tu heureux de participer(OUI/NON)")).get
+
+        status(answer) must equalTo(OK)
+        contentAsString(answer) must equalTo("OUI")
+      }
+    }
+
+    "should answer to markdown ready" in {
+      running(FakeApplication()) {
+
+        val answer = route(FakeRequest(GET, "/?q=Es tu pret a recevoir une enonce au format markdown par http post(OUI/NON)")).get
+
+        status(answer) must equalTo(OK)
+        contentAsString(answer) must equalTo("OUI")
+      }
+    }
+
+    "should not answer always yes" in {
+      running(FakeApplication()) {
+
+        val answer = route(FakeRequest(GET, "/?q=Est ce que tu reponds toujours oui(OUI/NON)")).get
+
+        status(answer) must equalTo(OK)
+        contentAsString(answer) must equalTo("NON")
+      }
+    }
+
+    "should manage post enonce" in {
+      running(FakeApplication()) {
+
+        val answer = route(FakeRequest(POST, "/enonce/1").withTextBody("enonce")).get
+
+        status(answer) must equalTo(CREATED)
+      }
+    }
+
+    "should know first enonce" in {
+      running(FakeApplication()) {
+
+        val answer = route(FakeRequest(GET, "/?q=As tu bien recu le premier enonce(OUI/NON)")).get
+
+        status(answer) must equalTo(OK)
+        contentAsString(answer) must equalTo("OUI")
+      }
+    }
+
+    "should have good night" in {
+      running(FakeApplication()) {
+
+        val answer = route(FakeRequest(GET, "/?q=As tu passe une bonne nuit malgre les bugs de l etape precedente(PAS_TOP/BOF/QUELS_BUGS)")).get
+
+        status(answer) must equalTo(OK)
+        contentAsString(answer) must equalTo("QUELS_BUGS")
+      }
+    }
+
+    "should not copy" in {
+      running(FakeApplication()) {
+
+        val answer = route(FakeRequest(GET, "/?q=As tu copie le code de ndeloof(OUI/NON/JE_SUIS_NICOLAS)")).get
+
+        status(answer) must equalTo(OK)
+        contentAsString(answer) must equalTo("NON")
+      }
+    }
+
+    "should have good night" in {
+      running(FakeApplication()) {
+
+        val answer = route(FakeRequest(GET, "/?q=Souhaites-tu-participer-a-la-suite-de-Code-Story(OUI/NON)")).get
+
+        status(answer) must equalTo(OK)
+        contentAsString(answer) must equalTo("OUI")
       }
     }
   }
