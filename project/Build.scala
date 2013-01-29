@@ -9,7 +9,8 @@ object ApplicationBuild extends Build {
 
   val appDependencies = Seq(
     // Add your project dependencies here,
-    anorm
+    anorm,
+    "org.codehaus.groovy" % "groovy" % "2.0.6"
   )
 
 
