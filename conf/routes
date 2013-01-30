@@ -5,7 +5,8 @@
 # Home page
 GET     /                           controllers.Application.index
 POST    /enonce/:id                 controllers.Application.enonce(id: Integer)
-GET     /scalaskel/change/:change          controllers.Scalaskel.change(change: Integer)
+GET     /scalaskel/change/:change   controllers.Scalaskel.change(change: Integer)
+POST    /jajascript/optimize        controllers.Jajascript.optimize
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
