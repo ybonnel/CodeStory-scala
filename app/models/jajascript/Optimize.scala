@@ -15,14 +15,16 @@ case class Optimize(flightsIn:Seq[Flight]) {
   def optimize:Solution = {
     flights.foreach(flight => {
       val possibleSolutions = lastSolutions.filter(solution => flight.startTime >= solution.endTime)
-
       if (possibleSolutions.isEmpty) {
         lastSolutions.enqueue(Solution(flight.end, flight.price, Seq(flight)))
       } else {
         val bestSolution = possibleSolutions.maxBy(solution => solution.price)
         lastSolutions.enqueue(Solution(flight.end, bestSolution.price + flight.price, bestSolution.acceptedFlights.union(Seq(flight))))
+        lastSolutions.dequeueAll(solution => { solution.price < bestSolution.price})
       }
     })
+
+
 
     lastSolutions.maxBy(solution => solution.price)
   }
