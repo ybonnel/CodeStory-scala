@@ -23,13 +23,15 @@ object Jajascript extends Controller {
       }
       )
 
-      val solution = Optimize(jajascriptRequest).optimize
+      val optimize = Optimize(jajascriptRequest)
+
+      val solution = optimize.optimize
 
       val elapsedTime = System.nanoTime() - startTime
 
       Logger.info("Time for " + jajascriptRequest.size + " flights : " + elapsedTime + "ns")
 
-      Ok(Json.toJson(solution.toJson))
+      Ok(Json.toJson(solution.toJson(optimize.flights)))
   }
 
 }
