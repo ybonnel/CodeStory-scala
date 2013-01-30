@@ -8,12 +8,12 @@ import play.Logger
 object Jajascript extends Controller {
 
 
-  def optimize = Action(parse.text(maxLength = 1024 * 1024 * 50)) {
+  def optimize = Action(parse.tolerantJson(maxLength = 1024 * 1024 * 50)) {
     request =>
 
       val startTime = System.nanoTime()
 
-      val jajascriptRequest = Json.parse(request.body).asInstanceOf[JsArray].value.map(jsValue => {
+      val jajascriptRequest = request.body.asInstanceOf[JsArray].value.map(jsValue => {
         val jsFlight = jsValue.asInstanceOf[JsObject]
         Flight(
           jsFlight.value.get("VOL").get.as[String],
