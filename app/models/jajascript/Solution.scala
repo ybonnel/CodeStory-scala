@@ -1,20 +1,32 @@
 package models.jajascript
 
 import play.api.libs.json._
-import java.util
+import scala.collection.mutable
+import play.api.Logger
 
 
-case class Solution(endTime: Int, price: Int, acceptedFlights: util.BitSet) {
+case class Solution(endTime: Int, price: Int, oldSolution: Option[Solution], lastFlight: Flight) {
 
-  def toJson(flights: Seq[Flight]): JsObject = {
 
-    val flightsWithPosition = flights.zip((0 to flights.size))
+  def flights: Seq[Flight] = {
+
+    var allSolutions = mutable.DoubleLinkedList[Solution]()
+    allSolutions = allSolutions.append(mutable.DoubleLinkedList(this))
+    var currentSolution = oldSolution
+    while (currentSolution.isDefined) {
+      allSolutions = allSolutions.append(mutable.DoubleLinkedList(currentSolution.get))
+      currentSolution = currentSolution.get.oldSolution
+    }
+
+
+    allSolutions.reverse.map(solution => solution.lastFlight).toSeq
+  }
+
+  def toJson(): JsObject = {
 
     Json.obj(
       "gain" -> JsNumber(price),
-      "path" -> JsArray(flightsWithPosition.filter(
-        (value: (Flight, Int)) => acceptedFlights.get(value._2)).map(
-          (value: (Flight, Int)) => JsString(value._1.name)))
+      "path" -> JsArray(flights.map(flight => JsString(flight.name)))
     )
   }
 }
